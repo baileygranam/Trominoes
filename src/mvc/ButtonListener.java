@@ -9,10 +9,12 @@ package mvc;
  */
 import java.lang.reflect.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.lang.IllegalAccessException;
 
-public class ButtonListener extends MouseAdapter
+public class ButtonListener extends MouseAdapter implements ActionListener
 {
     //////////////////////////
     //     Properties       //
@@ -123,4 +125,10 @@ public class ButtonListener extends MouseAdapter
     {
         myArguments = arguments;
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -96,7 +96,7 @@ public class Model
 	 * Method returns the size of the board.
 	 * @return
 	 */
-	public double getBoardSize() {
+	public int getBoardSize() {
 		return myBoardSize;
 	}
 

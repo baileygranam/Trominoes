@@ -24,10 +24,10 @@ public class Controller
         
         while(myModel.isBoardSet() == false)
         {
-        	getBoardSize();
+        	setBoardSize();
         }
         
-        myView.display();
+        myView.display(myModel.getBoardSize());
     } 
     
     /**
@@ -39,8 +39,8 @@ public class Controller
      * to model for processing. 
      */
     
-    public void getBoardSize()
+    public void setBoardSize()
     {
-    	myModel.setBoardSize(myView.getBoardSize());
+    	myModel.setBoardSize(myView.askBoardSize());
     }
 }
