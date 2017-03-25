@@ -9,7 +9,7 @@ package model;
  *
  */
 
-public class Trominoes 
+public class TrominoesModel 
 {
 	
 	private int myX; // X Coordinate of board
@@ -18,7 +18,7 @@ public class Trominoes
 	private int myYMissing; // Y Coordinate of missing square
 	private int myBoardSize; // Size of board
 	
-	public Trominoes()
+	public TrominoesModel()
 	{
 		myX = 0;
 		myY = 0;
