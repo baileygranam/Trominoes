@@ -2,7 +2,7 @@ package mvc;
 
 public class Model 
 {
-	
+
 	private int myX; // X Coordinate of board
 	private int myY; // Y Coordinate of board
 	private int myXMissing; // X Coordinate of missing square
@@ -85,11 +85,122 @@ public class Model
 	 * Method to tile the board.
 	 * 
 	 * [Incomplete]
-	 * @param myBoardSize
+	 * 
 	 */
-	public void tileBoard(int myBoardSize)
+	public void tromino(int myXBoard, 
+			int myYBoard, 
+			int myXMissing, 
+			int myYMissing,
+			int myBoardSize)
 	{
+		int myHalfSize = myBoardSize/2;
 
+		int myXCenter,
+		myYCenter,
+		myXUpperLeft,
+		myYUpperLeft,
+		myXUpperRight,
+		myYUpperRight,
+		myXLowerRight,
+		myYLowerRight = 0,
+		myXLowerLeft,
+		myYLowerLeft;
+
+		if(myBoardSize/2 == 1)
+		{
+			// Print Position of tromino
+			// Find and print orientation of tromino
+			if(myX == myXMissing)
+				//Missing square in left half
+				if(myY == myYMissing)
+				{
+					//Missing square in lower left
+				}
+				else
+				{
+					//Missing square in upper left
+				}
+			else 
+			{
+				//Missing square in right half
+				if(myY == myYMissing)
+				{
+					//Missing square in lower right
+				}
+				else 
+				{
+					//Missing square in upper right
+				}
+			}
+			return;
+		}
+
+		// Computer x and y coordinates of center of board 
+		myXCenter = myX + myHalfSize;
+		myYCenter = myY + myHalfSize;
+
+		// Position of special, center tromino
+
+		// Find/display orientation of center tromino
+		// also set myXUpperLeft and myYUpperLeft
+		if(myXMissing < myXCenter)
+		{
+			//Missing square in left half.
+			myXUpperRight = myXLowerRight = myXCenter;
+			myYUpperRight = myYCenter;
+
+			if(myYMissing < myYCenter)
+			{
+				//Missing square in lower left quadrant
+				myXUpperLeft = myXCenter - 1;
+				myYUpperLeft = myYCenter;
+				myXLowerLeft = myXMissing;
+				myYLowerLeft = myYMissing;
+			}
+			else
+			{
+				// Missing square in upper left quadrant
+				myXUpperLeft = myXMissing;
+				myYUpperLeft = myYMissing;
+				myXLowerLeft = myXCenter - 1;
+				myYLowerLeft = myYCenter - 1;
+			}
+		}
+		else
+		{
+			//Missing square in right half
+			myXUpperLeft = myXLowerLeft = myXCenter - 1;
+			myYUpperLeft = myYCenter;
+			myYLowerLeft = myYCenter - 1;
+
+			if(myYMissing < myYCenter)
+			{
+				//Missing Square in lower right quadrant
+				myXUpperRight = myXCenter;
+				myYUpperRight = myYCenter;
+				myXLowerRight = myXMissing;
+				myYLowerRight = myYMissing;
+			}
+			else
+			{
+				//Missing square in upper right quadrant
+				myXUpperRight = myXMissing;
+				myYUpperRight = myYMissing;
+				myXLowerRight = myXCenter;
+				myYLowerRight = myYCenter - 1;
+			}
+
+		}
+
+		// Title the four sub-boards 
+		tromino(myX, myY + myHalfSize, 
+				myXUpperLeft, myYUpperLeft, myHalfSize);
+		tromino(myX + myHalfSize, myY + myHalfSize,
+				myXUpperRight, myYUpperRight, myHalfSize);
+		tromino(myX + myHalfSize, myY,
+				myXLowerRight, myYLowerRight, myHalfSize);
+		tromino(myX, myX,
+				myXLowerLeft, myYLowerLeft, myHalfSize);			
 	}
 
 	/**
@@ -99,7 +210,7 @@ public class Model
 	public int getBoardSize() {
 		return myBoardSize;
 	}
-	
+
 	/**
 	 * Method to return the boolean of myBoardSet
 	 * @return
