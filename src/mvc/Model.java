@@ -99,7 +99,11 @@ public class Model
 	public int getBoardSize() {
 		return myBoardSize;
 	}
-
+	
+	/**
+	 * Method to return the boolean of myBoardSet
+	 * @return
+	 */
 	public boolean isBoardSet() {
 		return myBoardSet;
 	}

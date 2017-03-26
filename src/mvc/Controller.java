@@ -43,4 +43,9 @@ public class Controller
     {
     	myModel.setBoardSize(myView.askBoardSize());
     }
+    
+    public void setMissingSquare(int x, int y)
+    {
+    	myModel.setMissingSquare(x,y);
+    }
 }
