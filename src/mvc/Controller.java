@@ -4,6 +4,7 @@ public class Controller
 {    
     private View myView;
     private Model myModel;
+    private int mySize;
     
     /**
      * Controller constructor; view must be passed in since 
@@ -12,40 +13,51 @@ public class Controller
      * 
      * The constructor creates a view and model. 
      * 
-     * While the board size is not set (determined in Model.java) we will 
+     * While the board size is not set determined in Model.java we will 
      * keep asking the user for a board size. Once a proper board size has
      * been given we will load the display. 
      */
-    
     public Controller()
-    {
-        myModel = new Model();
-        myView = new View(this);  
-        
-        while(myModel.isBoardSet() == false)
-        {
-        	setBoardSize();
-        }
-        
-        myView.display(myModel.getBoardSize());
-    } 
-    
-    /**
-     * Method that will update the view to ask the user for a board size. The size
-     * given by the user will then be returned to the controller which will be 
-     * passed to the model to attempt to set the board size.
-     * 
-     * Controller updates view, view sends data to controller, controller sends data
-     * to model for processing. 
-     */
-    
-    public void setBoardSize()
-    {
-    	myModel.setBoardSize(myView.askBoardSize());
+    {  
+        myView = new View(this);
+        mySize = Integer.parseInt(myView.askBoardSize());
+        myView.display(mySize);
+        myModel = new Model();     
     }
     
-    public void setMissingSquare(int x, int y)
+    /** 
+     * This method takes in a string of coordinates from the button that the user
+     * had press to choose a missing square. This string is then split into
+     * its respective x any y values and turned into numeric values instead
+     * of chars. Finally we pass these numerical x and y values to the model
+     * to set the missing square.
+     * 
+     * @param coordinates
+     */
+    public void setMissingSquare(String coordinates)
     {
-    	myModel.setMissingSquare(x,y);
+    	int x = Character.getNumericValue(coordinates.charAt(0));
+    	int y = Character.getNumericValue(coordinates.charAt(0));
+    	myModel.setMissingSquare(x, y);
+    	myView.disableLabels();
+    	myView.placeMissingSquare(x, y);
+    }
+    
+    /**
+     * Method to set the size of the board.
+     * 
+     * @param size
+     */
+    public void setBoardSize(int size)
+    {
+    	myModel.setBoardSize(size);
+    }
+    
+    /**
+     * Method to tile the board.
+     */
+    public void tileBoard()
+    {
+    	myModel.tile();
     }
 }

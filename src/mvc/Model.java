@@ -1,221 +1,178 @@
 package mvc;
 
-public class Model 
-{
+import java.util.*;
 
-	private int myX; // X Coordinate of board
-	private int myY; // Y Coordinate of board
-	private int myXMissing; // X Coordinate of missing square
-	private int myYMissing; // Y Coordinate of missing square
-	private boolean myBoardSet; // Used in determining if the board has been set
-	protected int myBoardSize; // Size of board
+public class Model {
+	
+	private int[][] grid;
+	private int currentNum,
+				myMissingX,
+				myMissingY,
+				myBoardSize;
 
-	/**
-	 * The purpose of this constructor is to set the default coordinates of the board
-	 * to (0,0). The default location of the missing piece is (0,0).
+	/** 
+	 * To create the model we first need the 
+	 * @param size
 	 */
-	public Model()
-	{
-		myX = 0;
-		myY = 0;
-		myXMissing = 0;
-		myYMissing = 0;
-		myBoardSet = false;
+	public Model() {
+		
+	//	int actualsize = 1;
+		//while (actualsize < size) actualsize*=2;
+		
+		// Make sure the grid size is a perfect power of 2.
+	///	grid = new int[actualsize][actualsize];
+	//	currentNum = 1;
+		
+		// Fill in the grid with all empty squares.
+	//	for (int i=0; i<actualsize; i++) {
+	//		for (int j=0; j<actualsize; j++) {
+	//			grid[i][j] = 0;
+		//	}
+	//	}
+		
+		// This represents the original hole in the tromino.
+	//	grid[x][y] = -1;
 	}
-
-	/**
-	 * The purpose of this method is to overall set the size of the board indicated
-	 * by the user's input received from the origin of view.getBoardSize().  
-	 * 
-	 * 1. We are going to initialize mySize. We will use this variable as a temporary
-	 * 	  holder of the user's inputed board size. 
-	 * 
-	 * 2. We are going to try to convert the string entered by the user to an integer. If
-	 * 	  the string contains anything other than a numerical value then we will catch this
-	 *    exception and exit the method. Likewise, if the value entered by the user is less
-	 *    than 2 OR the log base 2 of mySize modulo 1 is anything other than 0 we will exit.
-	 *    
-	 * 3. By exiting the method the user will then again
-	 *    be asked to enter a value. [See controller constructor].
-	 *    
-	 * 4. Finally we will calculate/set the board size by 
-	 *    taking n * n.
-	 *    
-	 *    I.e if a user enters a board size of 2 then it will be calculated
-	 *    2 x 2.
-	 * 
-	 * @param str
-	 */
-	public void setBoardSize(String str) 
-	{
-		int mySize = 0;
-
-		try
-		{
-			mySize = Integer.parseInt(str);
-		}
-		catch (NumberFormatException e)
-		{
-			return;
-		}
-		if((Math.log(mySize)/Math.log(2))%1 != 0 || mySize < 2)
-		{
-			return;
-		}
-
-		myBoardSize = mySize;
-		myBoardSet = true;
+	
+	// Wrapper call for recursive method.
+	public void tile() {
+		tileRec(grid.length, 0, 0);
 	}
-
-	/**
-	 * Method to set the x and y coordinates of the missing square. 
-	 * 
-	 * [Still needs more implementation].
-	 * 
-	 * @param x
-	 * @param y
-	 */
+	
+	private void tileRec(int size, int topx, int topy) {
+		
+		// No recursive case needed here, just fill in your one tromino...
+		if (myBoardSize == 2) {
+		
+			// Fill in the one necessary tromino. The hole is identified by a
+			// non-zero number, so don't fill in that one square.	
+			for (int i=0; i<size; i++) 
+				for (int j=0; j<size; j++)
+					if (grid[topx+i][topy+j] == 0)
+						grid[topx+i][topy+j] = currentNum;
+		
+			// Advance to the next tromino.
+			currentNum++;
+		}
+		
+		// Recursive case...
+		else {
+			
+			// Find coordinates of missing hole
+			int savex=topx, savey=topy;
+			
+			for (int x=topx; x<topx+size; x++) 
+				for (int y=topy; y<topy+size; y++)
+					if (grid[x][y] != 0) {
+						savex = x;
+						savey = y;
+					}
+				
+			// Hole in upper left quadrant.		
+			if (savex < topx + size/2 && savey < topy + size/2) {
+				
+				// Recursively tile upper left quadrant.
+				tileRec(size/2, topx, topy);
+				
+				// Fill in middle tromino
+				grid[topx+size/2][topy+size/2-1] = currentNum;
+				grid[topx+size/2][topy+size/2] = currentNum;
+				grid[topx+size/2-1][topy+size/2] = currentNum;
+				
+				// Advance to the next tromino
+				currentNum++;
+				
+				// Now we can make our three other recursive calls.
+				tileRec(size/2, topx, topy+size/2);
+				tileRec(size/2, topx+size/2, topy);
+				tileRec(size/2, topx+size/2, topy+size/2);
+				
+			}
+			
+			// Hole in upper right quadrant
+			else if (savex < topx + size/2 && savey >= topy + size/2) {
+				
+				// Recursively tile upper right quadrant.
+				tileRec(size/2, topx, topy+size/2);
+				
+				// Fill in middle tromino
+				grid[topx+size/2][topy+size/2-1] = currentNum;
+				grid[topx+size/2][topy+size/2] = currentNum;
+				grid[topx+size/2-1][topy+size/2-1] = currentNum;
+				
+				// Advance to the next tromino
+				currentNum++;
+				
+				// Now we can make our three other recursive calls.
+				tileRec(size/2, topx, topy);
+				tileRec(size/2, topx+size/2, topy);
+				tileRec(size/2, topx+size/2, topy+size/2);
+				
+			}
+			
+			// Hole in bottom left quadrant
+			else if (savex >= topx + size/2 && savey < topy + size/2) {
+				
+				// Recursively tile bottom left quadrant.
+				tileRec(size/2, topx+size/2, topy);
+				
+				// Fill in middle tromino
+				grid[topx+size/2-1][topy+size/2] = currentNum;
+				grid[topx+size/2][topy+size/2] = currentNum;
+				grid[topx+size/2-1][topy+size/2-1] = currentNum;
+				
+				// Advance to the next tromino
+				currentNum++;
+				
+				// Now we can make our three other recursive calls.
+				tileRec(size/2, topx, topy);
+				tileRec(size/2, topx, topy+size/2);
+				tileRec(size/2, topx+size/2, topy+size/2);
+			}
+			else {
+				
+				// Recursively tile bottom right quadrant.
+				tileRec(size/2, topx+size/2, topy+size/2);
+				
+				// Fill in middle tromino
+				grid[topx+size/2-1][topy+size/2] = currentNum;
+				grid[topx+size/2][topy+size/2-1] = currentNum;
+				grid[topx+size/2-1][topy+size/2-1] = currentNum;
+				
+				// Advance to the next tromino
+				currentNum++;
+				
+				// Now we can make our three other recursive calls.
+				tileRec(size/2, topx+size/2, topy);
+				tileRec(size/2, topx, topy+size/2);
+				tileRec(size/2, topx, topy);
+			}
+			
+		} // end large if-else
+		
+	} // end tileRec
+	
+	
+	// Prints out the current object.
+	public void print() {
+		
+		for (int i=0; i<grid.length; i++) 
+		{
+			for (int j=0; j<grid[i].length; j++)
+				System.out.print(grid[i][j] + "\t");
+			System.out.println();
+		}
+	}
+	
 	public void setMissingSquare(int x, int y)
 	{
-		myXMissing = x;
-		myYMissing = y;
+		myMissingX = x;
+		myMissingY = y;
 	}
-
-	/**
-	 * Method to tile the board.
-	 * 
-	 * [Incomplete]
-	 * 
-	 */
-	public void tromino(int myXBoard, 
-			int myYBoard, 
-			int myXMissing, 
-			int myYMissing,
-			int myBoardSize)
+	
+	public void setBoardSize(int size)
 	{
-		int myHalfSize = myBoardSize/2;
-
-		int myXCenter,
-		myYCenter,
-		myXUpperLeft,
-		myYUpperLeft,
-		myXUpperRight,
-		myYUpperRight,
-		myXLowerRight,
-		myYLowerRight = 0,
-		myXLowerLeft,
-		myYLowerLeft;
-
-		if(myBoardSize/2 == 1)
-		{
-			// Print Position of tromino
-			// Find and print orientation of tromino
-			if(myX == myXMissing)
-				//Missing square in left half
-				if(myY == myYMissing)
-				{
-					//Missing square in lower left
-				}
-				else
-				{
-					//Missing square in upper left
-				}
-			else 
-			{
-				//Missing square in right half
-				if(myY == myYMissing)
-				{
-					//Missing square in lower right
-				}
-				else 
-				{
-					//Missing square in upper right
-				}
-			}
-			return;
-		}
-
-		// Computer x and y coordinates of center of board 
-		myXCenter = myX + myHalfSize;
-		myYCenter = myY + myHalfSize;
-
-		// Position of special, center tromino
-
-		// Find/display orientation of center tromino
-		// also set myXUpperLeft and myYUpperLeft
-		if(myXMissing < myXCenter)
-		{
-			//Missing square in left half.
-			myXUpperRight = myXLowerRight = myXCenter;
-			myYUpperRight = myYCenter;
-
-			if(myYMissing < myYCenter)
-			{
-				//Missing square in lower left quadrant
-				myXUpperLeft = myXCenter - 1;
-				myYUpperLeft = myYCenter;
-				myXLowerLeft = myXMissing;
-				myYLowerLeft = myYMissing;
-			}
-			else
-			{
-				// Missing square in upper left quadrant
-				myXUpperLeft = myXMissing;
-				myYUpperLeft = myYMissing;
-				myXLowerLeft = myXCenter - 1;
-				myYLowerLeft = myYCenter - 1;
-			}
-		}
-		else
-		{
-			//Missing square in right half
-			myXUpperLeft = myXLowerLeft = myXCenter - 1;
-			myYUpperLeft = myYCenter;
-			myYLowerLeft = myYCenter - 1;
-
-			if(myYMissing < myYCenter)
-			{
-				//Missing Square in lower right quadrant
-				myXUpperRight = myXCenter;
-				myYUpperRight = myYCenter;
-				myXLowerRight = myXMissing;
-				myYLowerRight = myYMissing;
-			}
-			else
-			{
-				//Missing square in upper right quadrant
-				myXUpperRight = myXMissing;
-				myYUpperRight = myYMissing;
-				myXLowerRight = myXCenter;
-				myYLowerRight = myYCenter - 1;
-			}
-
-		}
-
-		// Title the four sub-boards 
-		tromino(myX, myY + myHalfSize, 
-				myXUpperLeft, myYUpperLeft, myHalfSize);
-		tromino(myX + myHalfSize, myY + myHalfSize,
-				myXUpperRight, myYUpperRight, myHalfSize);
-		tromino(myX + myHalfSize, myY,
-				myXLowerRight, myYLowerRight, myHalfSize);
-		tromino(myX, myX,
-				myXLowerLeft, myYLowerLeft, myHalfSize);			
+		myBoardSize = size;
 	}
-
-	/**
-	 * Method returns the size of the board.
-	 * @return
-	 */
-	public int getBoardSize() {
-		return myBoardSize;
-	}
-
-	/**
-	 * Method to return the boolean of myBoardSet
-	 * @return
-	 */
-	public boolean isBoardSet() {
-		return myBoardSet;
-	}
+	
 }
