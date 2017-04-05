@@ -1,6 +1,7 @@
 package mvc;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.util.Random;
 
@@ -15,13 +16,33 @@ import javax.swing.border.LineBorder;
 
 public class View
 {
-	private Controller myController;
+	private Border 			   myBorder;
+
 	private ButtonListener[][] mySquareListener;
-	private JLabel[][] mySquareLabels;
-	private int mySize;
-	private Random myRandom;
-	private Color myRandomColor;
-	private Border myBorder;
+	private ButtonListener     mySolveListener,
+	myResetListener;
+
+	private Color 			   myRandomColor;
+
+	private Color[]            myColors;
+
+	private Controller         myController;
+
+	private JFrame 			   myFrame;
+
+	private int 			   myBoardSize;
+
+	private JButton            mySolveButton,
+	myResetButton;
+
+	private JLabel[][]         mySquareLabels;
+
+	private JLabel             myInformationLabel;
+
+	private JPanel             myBoardPanel,
+	myNavigationPanel;
+
+	private Random 			   myRandom;
 
 	/**
 	 * Constructor to instantiate the class, used in Controller.java
@@ -30,7 +51,69 @@ public class View
 	 */
 	public View(Controller controller) 
 	{
+		// Establish the controller
 		myController = controller;
+
+		// Declare the JmyFrame with a title of "Trominoes Puzzle".
+		myFrame = new JFrame("Trominoes Puzzle");
+
+		// Establish Panels
+		myBoardPanel       = new JPanel();
+		myNavigationPanel  = new JPanel();
+
+		// Establish Buttons
+		mySolveButton 	   = new JButton("Solve");
+		myResetButton      = new JButton("Reset");
+
+		// Establish Labels
+		myInformationLabel = new JLabel();
+
+		// Associate listeners
+		this.associateListeners(myController);
+	}
+
+	/**
+	 * The main display of the application.
+	 */
+	public void display(int size) 
+	{
+		// Set size of board
+		myBoardSize = size;
+
+		// Establish JLabel array that will act as the board grid for the myBoard Panel
+		mySquareLabels  = new JLabel[myBoardSize][myBoardSize];
+
+		// Establish an array of listeners used in selecting a missing square.
+		mySquareListener = new ButtonListener[myBoardSize][myBoardSize];
+
+		// Properties of the JFrame
+		myFrame.setSize(900, 500);
+		myFrame.setLayout(new FlowLayout());
+		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// Properties of the myBoard Panel
+		myBoardPanel.setLayout(new GridLayout(myBoardSize, myBoardSize));
+
+		newBoard();
+
+		// Add listeners to buttons
+		mySolveButton.addMouseListener(mySolveListener);
+		myResetButton.addMouseListener(myResetListener);
+
+		// Add items to myNavigationPanel
+		myNavigationPanel.add(mySolveButton); 
+		myNavigationPanel.add(myResetButton);
+		myNavigationPanel.add(myInformationLabel);
+
+		// Add panels to the frame
+		myFrame.add(myBoardPanel);
+		myFrame.add(myNavigationPanel);
+
+		// Set Visibility
+		myFrame.setVisible(true);
+
+		// Associate listeners
+		this.associateListeners(myController);
 	}
 
 	/**
@@ -43,10 +126,9 @@ public class View
 	{
 		return (JOptionPane.showInputDialog("What is the size of the board?"));
 	}
-	
-	
+
 	/**
-	 *   I. This method is called when a user selects a label on the grid as 
+	 *   I. This method is called when a user selects a label on the myBoard as 
 	 *      the missing piece.
 	 *      
 	 *  II. Once a missing piece is set we no longer need action listeners on
@@ -55,15 +137,15 @@ public class View
 	 */
 	public void disableLabels()
 	{
-		for (int i = 0; i < mySize; i++) 
+		for (int i = 0; i < myBoardSize; i++) 
 		{
-			for (int j = 0; j < mySize; j++) 
+			for (int j = 0; j < myBoardSize; j++) 
 			{
 				mySquareLabels[i][j].removeMouseListener(mySquareListener[i][j]);
 			}
 		}		
 	}
-	
+
 	/**
 	 * The purpose of this method is to place the missing square on the graph that
 	 * will be represented as a label with a white background.
@@ -73,10 +155,10 @@ public class View
 	 */
 	public void placeMissingSquare(int x, int y)
 	{
-		mySquareLabels[x][y].setIcon(new ImageIcon("src/colors/5.png"));
+		mySquareLabels[x][y].setBackground(Color.WHITE);
 
 	}
-	
+
 	/** 
 	 *  I. The purpose of this method is to generate a random color for the use
 	 *     in tiling a distinct trominoe.
@@ -90,77 +172,58 @@ public class View
 	public Color newRandomColor()
 	{
 		myRandom = new Random();
-		
+
 		float r = myRandom.nextFloat();
 		float g = myRandom.nextFloat();
 		float b = myRandom.nextFloat();
-		
+
 		myRandomColor = new Color(r, g, b);
 
 		return myRandomColor;
-		
+
 	}
 
-	/**
-	 * The main display of the application.
-	 */
-	public void display(int size) 
+	public void setColorArray()
 	{
-		// Set size of board
-		mySize = size;
-		
-		// Title of the application
-		JFrame frame = new JFrame("Trominoes Puzzle");
+		myColors = new Color[10];
 
-		// Properties of the window
-		frame.setSize(800, 500);
-		frame.setResizable(false);
-		frame.setLayout(new FlowLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		// Grid panel
-		JPanel grid = new JPanel(new GridLayout(mySize, mySize));
-
-		// Create an array of labels that will be added to visualize the grid
-		mySquareLabels  = new JLabel[mySize][mySize];
-
-		// Assign a label to [i][j] where i and j are coordinates x and y,
-		// then add it to the grid.
-		for (int i = 0; i < mySize; i++) 
+		for(int i = 1; i < 10; i++)
 		{
-			for (int j = 0; j < mySize; j++) 
+			myColors[i] = newRandomColor();
+		}
+	}
+
+	public void setTiles(int x, int y)
+	{
+
+		for(int i = 1; i < 16; i++)
+		{
+			if(myController.getGrid()[x][y] == i)
+			{
+				mySquareLabels[x][y].setBackground(myColors[i]);
+				return;
+			}
+		}
+
+	}
+
+	public void newBoard()
+	{
+		for (int i = 0; i < myBoardSize; i++) 
+		{
+			for (int j = 0; j < myBoardSize; j++) 
 			{
 				mySquareLabels[i][j] = new JLabel();
-				mySquareLabels[i][j].setPreferredSize(new Dimension(50,50));
-			    myBorder = LineBorder.createBlackLineBorder();
+				mySquareLabels[i][j].setPreferredSize(new Dimension(30,30));
+				myBorder = LineBorder.createBlackLineBorder();
 				mySquareLabels[i][j].setBackground(Color.GRAY);
 				mySquareLabels[i][j].setBorder(myBorder);
 				mySquareLabels[i][j].setOpaque(true);
-				grid.add(mySquareLabels[i][j]);
+				myBoardPanel.add(mySquareLabels[i][j]);
 			}
 		}
-		
-		// Create an array of listeners used in selecting a missing square.
-		mySquareListener = new ButtonListener[mySize][mySize];
-		
-		// Create label
-		JLabel myInformationLabel = new JLabel("Select a missing square..");
-		
-		JPanel myInformationPanel = new JPanel();
-		
-		myInformationPanel.add(myInformationLabel);
-
-		
-		// Add panels
-		frame.add(grid);
-		frame.add(myInformationPanel);
-		
-		// Set Visibility
-		frame.setVisible(true);
-		
-        // Associate listeners
-        this.associateListeners(myController);
 	}
+
 
 	/**
 	 * Associates each component's listener with the controller and the correct
@@ -175,12 +238,16 @@ public class View
 	public void associateListeners(Controller controller) 
 	{
 		Class<? extends Controller> controllerClass;
-		Method setMissingSquareMethod;
+		Method setMissingSquareMethod,
+		solveMethod,
+		resetMethod;
 		Class<?>[] classArgs;
 
 		controllerClass = controller.getClass();
 
 		setMissingSquareMethod = null;
+		solveMethod			   = null;
+		resetMethod 		   = null;
 
 		classArgs = new Class[1];
 
@@ -196,6 +263,8 @@ public class View
 		}
 		try 
 		{
+			solveMethod    = controllerClass.getMethod("solve",(Class<?>[])null);
+			resetMethod    = controllerClass.getMethod("reset",(Class<?>[])null);
 			setMissingSquareMethod = controllerClass.getMethod("setMissingSquare", classArgs);
 		} 
 		catch (NoSuchMethodException exception) 
@@ -211,12 +280,17 @@ public class View
 			System.out.println(error);
 		}
 
+		mySolveListener = new ButtonListener(controller, solveMethod, null);
+		myResetListener = new ButtonListener(controller, resetMethod, null);
+
+
+
 		int i, j;
 		String[] args;
 
-		for (i = 0; i < mySize; i++) 
+		for (i = 0; i < myBoardSize; i++) 
 		{
-			for (j = 0; j < mySize; j++) 
+			for (j = 0; j < myBoardSize; j++) 
 			{
 				args = new String[1];
 				args[0] = new String(i+""+j);
