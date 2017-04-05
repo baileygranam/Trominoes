@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 public class View
 {
@@ -17,6 +19,9 @@ public class View
 	private ButtonListener[][] mySquareListener;
 	private JLabel[][] mySquareLabels;
 	private int mySize;
+	private Random myRandom;
+	private Color myRandomColor;
+	private Border myBorder;
 
 	/**
 	 * Constructor to instantiate the class, used in Controller.java
@@ -39,6 +44,15 @@ public class View
 		return (JOptionPane.showInputDialog("What is the size of the board?"));
 	}
 	
+	
+	/**
+	 *   I. This method is called when a user selects a label on the grid as 
+	 *      the missing piece.
+	 *      
+	 *  II. Once a missing piece is set we no longer need action listeners on
+	 *      any of the labels. So we remove all of them through this method.
+	 *      
+	 */
 	public void disableLabels()
 	{
 		for (int i = 0; i < mySize; i++) 
@@ -50,10 +64,41 @@ public class View
 		}		
 	}
 	
+	/**
+	 * The purpose of this method is to place the missing square on the graph that
+	 * will be represented as a label with a white background.
+	 * 
+	 * @param x coordinate
+	 * @param y coordinate
+	 */
 	public void placeMissingSquare(int x, int y)
 	{
 		mySquareLabels[x][y].setIcon(new ImageIcon("src/colors/5.png"));
 
+	}
+	
+	/** 
+	 *  I. The purpose of this method is to generate a random color for the use
+	 *     in tiling a distinct trominoe.
+	 *     
+	 * II. The way this method works is that it utilizes RGB colors as well as the
+	 *     'Random' component. Three float values are generated through random 
+	 *     numbers then plugged in to create a new color. 
+	 *      
+	 * @return generated color
+	 */
+	public Color newRandomColor()
+	{
+		myRandom = new Random();
+		
+		float r = myRandom.nextFloat();
+		float g = myRandom.nextFloat();
+		float b = myRandom.nextFloat();
+		
+		myRandomColor = new Color(r, g, b);
+
+		return myRandomColor;
+		
 	}
 
 	/**
@@ -76,30 +121,39 @@ public class View
 		// Grid panel
 		JPanel grid = new JPanel(new GridLayout(mySize, mySize));
 
-		// Create an array of buttons
+		// Create an array of labels that will be added to visualize the grid
 		mySquareLabels  = new JLabel[mySize][mySize];
 
-		// Assign a button to [i][j] where i and j are 'coordinates.
-		// then add it to the grid. 
+		// Assign a label to [i][j] where i and j are coordinates x and y,
+		// then add it to the grid.
 		for (int i = 0; i < mySize; i++) 
 		{
 			for (int j = 0; j < mySize; j++) 
 			{
-				mySquareLabels[i][j] = new JLabel(i + " " + j);
-				mySquareLabels[i][j].setPreferredSize(new Dimension(20,20));
-				Random ran = new Random();
-				int x = ran.nextInt(4);
-				mySquareLabels[i][j].setIcon(new ImageIcon("src/colors/" + x +".png"));
-
+				mySquareLabels[i][j] = new JLabel();
+				mySquareLabels[i][j].setPreferredSize(new Dimension(50,50));
+			    myBorder = LineBorder.createBlackLineBorder();
+				mySquareLabels[i][j].setBackground(Color.GRAY);
+				mySquareLabels[i][j].setBorder(myBorder);
+				mySquareLabels[i][j].setOpaque(true);
 				grid.add(mySquareLabels[i][j]);
 			}
 		}
 		
-		// Create an array of listeners
+		// Create an array of listeners used in selecting a missing square.
 		mySquareListener = new ButtonListener[mySize][mySize];
+		
+		// Create label
+		JLabel myInformationLabel = new JLabel("Select a missing square..");
+		
+		JPanel myInformationPanel = new JPanel();
+		
+		myInformationPanel.add(myInformationLabel);
+
 		
 		// Add panels
 		frame.add(grid);
+		frame.add(myInformationPanel);
 		
 		// Set Visibility
 		frame.setVisible(true);

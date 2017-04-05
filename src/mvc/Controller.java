@@ -37,7 +37,7 @@ public class Controller
     public void setMissingSquare(String coordinates)
     {
     	int x = Character.getNumericValue(coordinates.charAt(0));
-    	int y = Character.getNumericValue(coordinates.charAt(0));
+    	int y = Character.getNumericValue(coordinates.charAt(1));
     	myModel.setMissingSquare(x, y);
     	myView.disableLabels();
     	myView.placeMissingSquare(x, y);
