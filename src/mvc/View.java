@@ -1,11 +1,9 @@
 package mvc;
 
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
