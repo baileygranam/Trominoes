@@ -17,8 +17,9 @@ public class View
 	private Border 			   myBorder;
 
 	private ButtonListener[][] mySquareListener;
+	
 	private ButtonListener     mySolveListener,
-	myResetListener;
+							   myResetListener;
 
 	private Color 			   myRandomColor;
 
@@ -31,14 +32,14 @@ public class View
 	private int 			   myBoardSize;
 
 	private JButton            mySolveButton,
-	myResetButton;
+						       myResetButton;
 
 	private JLabel[][]         mySquareLabels;
 
 	private JLabel             myInformationLabel;
 
 	private JPanel             myBoardPanel,
-	myNavigationPanel;
+							   myNavigationPanel;
 
 	private Random 			   myRandom;
 
@@ -83,7 +84,7 @@ public class View
 
 		// Establish an array of listeners used in selecting a missing square.
 		mySquareListener = new ButtonListener[myBoardSize][myBoardSize];
-
+		
 		// Properties of the JFrame
 		myFrame.setSize(900, 500);
 		myFrame.setLayout(new FlowLayout());
@@ -92,6 +93,7 @@ public class View
 		// Properties of the myBoard Panel
 		myBoardPanel.setLayout(new GridLayout(myBoardSize, myBoardSize));
 
+		// Method that generates the board. See method newBoard() for more information.
 		newBoard();
 
 		// Add listeners to buttons
@@ -102,6 +104,9 @@ public class View
 		myNavigationPanel.add(mySolveButton); 
 		myNavigationPanel.add(myResetButton);
 		myNavigationPanel.add(myInformationLabel);
+		
+		// Set the array of colors
+	    setColorArray(); 
 
 		// Add panels to the frame
 		myFrame.add(myBoardPanel);
@@ -109,6 +114,14 @@ public class View
 
 		// Set Visibility
 		myFrame.setVisible(true);
+
+		// Frame Sizing/Positioning/Compacting
+		myFrame.setLocationRelativeTo(null);
+		
+		// Set buttons to disabled as default. 
+		// (We need to choose a missing square before being able to solve the puzzle)
+		mySolveButton.setVisible(false);
+		myResetButton.setVisible(false);
 
 		// Associate listeners
 		this.associateListeners(myController);
@@ -133,7 +146,7 @@ public class View
 	 *      any of the labels. So we remove all of them through this method.
 	 *      
 	 */
-	public void disableLabels()
+	public void disableBoard()
 	{
 		for (int i = 0; i < myBoardSize; i++) 
 		{
@@ -178,23 +191,31 @@ public class View
 		myRandomColor = new Color(r, g, b);
 
 		return myRandomColor;
-
 	}
 
+	/**
+	 * The purpose of this method is to generate an array of randomized colors
+	 * to be used in tiling the board.
+	 */
 	public void setColorArray()
 	{
-		myColors = new Color[10];
+		myColors = new Color[100];
 
-		for(int i = 1; i < 10; i++)
+		for(int i = 1; i <100; i++)
 		{
 			myColors[i] = newRandomColor();
 		}
 	}
 
+	/**
+	 * This method is called from the Controller when the 'solve' button is engaged. 
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	public void setTiles(int x, int y)
 	{
-
-		for(int i = 1; i < 16; i++)
+		for(int i = 1; i < (myBoardSize*myBoardSize); i++)
 		{
 			if(myController.getGrid()[x][y] == i)
 			{
@@ -202,9 +223,13 @@ public class View
 				return;
 			}
 		}
-
 	}
 
+	/**
+	 *  This method is used in creating a new game board. It loops through the
+	 *  size of the board and creates a square in the form of a JLabel. The output
+	 *  is then displayed as a grid.
+	 */
 	public void newBoard()
 	{
 		for (int i = 0; i < myBoardSize; i++) 
@@ -221,7 +246,38 @@ public class View
 			}
 		}
 	}
-
+	
+	/**
+	 * This method is used to reset the board so that we may choose a new missing square.
+	 */
+	public void resetBoard()
+	{
+		for (int i = 0; i < myBoardSize; i++) 
+		{
+			for (int j = 0; j < myBoardSize; j++) 
+			{
+				myBorder = LineBorder.createBlackLineBorder();
+				mySquareLabels[i][j].setBackground(Color.GRAY);
+				mySquareLabels[i][j].setOpaque(true);
+			}
+		}	
+	}
+	
+	/**
+	 * Method to toggle buttons between reset and selecting a missing square.
+	 * I.e we shouldn't be able to solve or reset an empty grid. Additionally
+	 * we shouldn't be able to solve a grid without a missing square.
+	 */
+	public void toggleButtons()
+	{
+		mySolveButton.setVisible(!mySolveButton.isVisible());
+		myResetButton.setVisible(!myResetButton.isVisible());
+	}
+	
+	public void setInformationLabel(String message)
+	{
+		myInformationLabel.setText(message);
+	}
 
 	/**
 	 * Associates each component's listener with the controller and the correct
@@ -280,8 +336,6 @@ public class View
 
 		mySolveListener = new ButtonListener(controller, solveMethod, null);
 		myResetListener = new ButtonListener(controller, resetMethod, null);
-
-
 
 		int i, j;
 		String[] args;

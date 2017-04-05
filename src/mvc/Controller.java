@@ -43,8 +43,10 @@ public class Controller
 		int x = Character.getNumericValue(coordinates.charAt(0));
 		int y = Character.getNumericValue(coordinates.charAt(1));
 		myModel.setMissingSquare(x, y);
-		myView.disableLabels();
 		myView.placeMissingSquare(x, y);
+		myView.toggleButtons();
+		myView.setInformationLabel("Click 'solve' to complete the puzzle!");
+
 	}
 
 	/**
@@ -62,8 +64,15 @@ public class Controller
 	public void newBoard()
 	{
 		mySize = getBoardSize();
-		myModel.setBoardSize(mySize);
+		
+		while(!myModel.setBoardSize(mySize))
+		{
+			mySize = getBoardSize();
+		}
+		
 		myView.display(mySize);
+		myView.setInformationLabel("Please choose a missing square...");
+	
 	}
 
 	/**
@@ -83,7 +92,6 @@ public class Controller
 	{
 		myModel.tromino();
 		myModel.tile();
-		myModel.print(); // [REMOVE THIS BEFORE SUBMITTING]
 		myView.setColorArray(); 
 
 		for(int i = 0; i < mySize; i++)
@@ -96,13 +104,22 @@ public class Controller
 				}
 			}
 		}
+		
+		myView.setInformationLabel("Puzzle Solved!");
+
 	}
 
 	/**
-	 * Need to complete the reset.
+	 * Method that resets the missing point in the model and clears the board
+	 * in the view for the user to select a new missing square.
 	 */
 	public void reset()
 	{
+		myView.toggleButtons();
+		myView.resetBoard();
+		myModel.reset();
+		
+		myView.setInformationLabel("Please choose a missing square...");
 
 	}
 

@@ -50,145 +50,111 @@ public class Model
 		tileRec(myGrid.length, 0, 0);
 	}
 
-	private void tileRec(int myBoardSize, int topx, int topy) {
+	
+	/**
+	 * Method that tiles the grid.
+	 * 
+	 * @param myBoardSize
+	 * @param originX
+	 * @param originY
+	 */
+	private void tileRec(int myBoardSize, int originX, int originY) {
 
-		// No recursive case needed here, just fill in your one tromino...
-		if (myBoardSize == 2) {
-
-			// Fill in the one necessary tromino. The hole is identified by a
-			// non-zero number, so don't fill in that one square.	
-			for (int i=0; i<myBoardSize; i++)
+		if (myBoardSize == 2) 
+		{
+			for (int i=0; i<myBoardSize; i++) 
 			{
 				for (int j=0; j<myBoardSize; j++)
 				{
-					if (myGrid[topx+i][topy+j] == 0)
+					if (myGrid[originX+i][originY+j] == 0)
 					{
-						myGrid[topx+i][topy+j] = myCurrentNumber;
+						myGrid[originX+i][originY+j] = myCurrentNumber;
 					}
 				}
 			}
-
-			// Advance to the next tromino.
-			myCurrentNumber++;
+			nextTrominoe();
+			//myFinalNumbIterations++;
 		}
-
-		// Recursive case...
-		else {
-
-			// Find coordinates of missing hole
-			int savex=topx, savey=topy;
-
-			for (int x=topx; x<topx+myBoardSize; x++) 
+		else 
+		{
+			int defX = originX, defY = originY;
+			for (int x = originX; x < originX+myBoardSize; x++) 
 			{
-				for (int y=topy; y<topy+myBoardSize; y++)
+				for (int y = originY; y < originY+myBoardSize; y++)
 				{
-					if (myGrid[myMissingX][myMissingY] != 0) 
+					if (myGrid[x][y] != 0) 
 					{
-						savex = x;
-						savey = y;
+						defX = x;
+						defY = y;
 					}
 				}
 			}
-
-			// Hole in upper left quadrant.		
-			if (savex < topx + myBoardSize/2 && savey < topy + myBoardSize/2) 
+				
+			if (defX < originX + myBoardSize/2 && defY < originY + myBoardSize/2) 
 			{
-
-				// Recursively tile upper left quadrant.
-				tileRec(myBoardSize/2, topx, topy);
-
-				// Fill in middle tromino
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2-1] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2] = myCurrentNumber;
-
-				// Advance to the next tromino
-				myCurrentNumber++;
-
-				// Now we can make our three other recursive calls.
-				tileRec(myBoardSize/2, topx, topy+myBoardSize/2);
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy);
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy+myBoardSize/2);
-
+				tileRec(myBoardSize/2, originX, originY);
+				
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2-1] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2] = myCurrentNumber;
+				
+				nextTrominoe();
+				
+				tileRec(myBoardSize/2, originX, originY+myBoardSize/2);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY+myBoardSize/2);	
 			}
-
-			// Hole in upper right quadrant
-			else if (savex < topx + myBoardSize/2 && savey >= topy + myBoardSize/2) 
+			else if (defX < originX + myBoardSize/2 && defY >= originY + myBoardSize/2) 
 			{
-
-				// Recursively tile upper right quadrant.
-				tileRec(myBoardSize/2, topx, topy+myBoardSize/2);
-
-				// Fill in middle tromino
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2-1] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2-1] = myCurrentNumber;
-
-				// Advance to the next tromino
-				myCurrentNumber++;
-
-				// Now we can make our three other recursive calls.
-				tileRec(myBoardSize/2, topx, topy);
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy);
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy+myBoardSize/2);
-
+				tileRec(myBoardSize/2, originX, originY+myBoardSize/2);
+				
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2-1] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2-1] = myCurrentNumber;
+				
+				nextTrominoe();
+				
+				tileRec(myBoardSize/2, originX, originY);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY+myBoardSize/2);
 			}
-
-			// Hole in bottom left quadrant
-			else if (savex >= topx + myBoardSize/2 && savey < topy + myBoardSize/2) 
+			else if (defX >= originX + myBoardSize/2 && defY < originY + myBoardSize/2) 
 			{
-
-				// Recursively tile bottom left quadrant.
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy);
-
-				// Fill in middle tromino
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2-1] = myCurrentNumber;
-
-				// Advance to the next tromino
-				myCurrentNumber++;
-
-				// Now we can make our three other recursive calls.
-				tileRec(myBoardSize/2, topx, topy);
-				tileRec(myBoardSize/2, topx, topy+myBoardSize/2);
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy+myBoardSize/2);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY);
+				
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2-1] = myCurrentNumber;
+				
+				nextTrominoe();
+				
+				tileRec(myBoardSize/2, originX, originY);
+				tileRec(myBoardSize/2, originX, originY+myBoardSize/2);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY+myBoardSize/2);
 			}
 			else 
 			{
-
-				// Recursively tile bottom right quadrant.
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy+myBoardSize/2);
-
-				// Fill in middle tromino
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2][topy+myBoardSize/2-1] = myCurrentNumber;
-				myGrid[topx+myBoardSize/2-1][topy+myBoardSize/2-1] = myCurrentNumber;
-
-				// Advance to the next tromino
-				myCurrentNumber++;
-
-				// Now we can make our three other recursive calls.
-				tileRec(myBoardSize/2, topx+myBoardSize/2, topy);
-				tileRec(myBoardSize/2, topx, topy+myBoardSize/2);
-				tileRec(myBoardSize/2, topx, topy);
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY+myBoardSize/2);
+				
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2][originY+myBoardSize/2-1] = myCurrentNumber;
+				myGrid[originX+myBoardSize/2-1][originY+myBoardSize/2-1] = myCurrentNumber;
+				
+				nextTrominoe();
+				
+				tileRec(myBoardSize/2, originX+myBoardSize/2, originY);
+				tileRec(myBoardSize/2, originX, originY+myBoardSize/2);
+				tileRec(myBoardSize/2, originX, originY);
 			}
 		} 
 	} 
-
-
+	
 	/**
-	 * Method to show us the trominoes in the console. 
-	 * 
-	 * [REMOVE BEFORE SUBMITION]
+	 * Increment the number
 	 */
-	public void print() {
-
-		for (int i=0; i<myGrid.length; i++) {
-			for (int j=0; j<myGrid[i].length; j++)
-				System.out.print(myGrid[i][j] + "\t");
-			System.out.println();
-		}
+	public void nextTrominoe()
+	{
+		myCurrentNumber++;
 	}
 
 	/**
@@ -206,9 +172,18 @@ public class Model
 	 * Set the size of the board.
 	 * @param size
 	 */
-	public void setBoardSize(int size)
+	public boolean setBoardSize(int mySize)
 	{
-		myBoardSize = size;
+		if((Math.log(mySize)/Math.log(2))%1 != 0 || mySize < 2)
+		{
+			return false;
+		}
+		else
+		{
+			myBoardSize = mySize;
+			
+			return true;
+		}
 	}
 
 	/**
@@ -218,5 +193,14 @@ public class Model
 	public int[][] getGrid()
 	{
 		return myGrid;
+	}
+	
+	/**
+	 * Method to reset the missing square.
+	 */
+	public void reset()
+	{
+		setMissingSquare(0,0);
+		tromino();
 	}
 }
